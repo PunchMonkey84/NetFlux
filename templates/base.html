@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale-1.0">
+        <title>NetfLux</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+        <header>
+            <h1>NetLux</h1>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/movies/0">Watchlist</a></li>
+                <li><a href="/movies/1">Watched</a></li>
+            </ul>
+                        <form method="POST" action="/search">
+                <input type="text" name="search" id="search">
+                <input type="hidden" name="status" value="{{ status | default('all') }}">
+                <input type="submit" value="Search">
+            </form>
+        </nav>
+
+        <main>
+            <form method="GET" action="/movies" class="filter-form">
+                <label for="genre">Genre: </label>
+                <select name="genre" id="genre">
+                    <option value="all">All Genres</option>
+                    {% for g in filter_options.genres %}
+                        <option value="{{ g }}" {% if work_filters.get('genre') == g %}selected{% endif %}>
+                        {{ g }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="director">Director: </label>
+                <select name="director" id="director">
+                    <option value="all">All Directors</option>
+                    {% for d in filter_options.directors %}
+                        <option value="{{ d }}" {% if work_filters.get('director') == d %}selected{% endif %}>
+                            {{ d }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <div class="duration-filter">
+                    <label>Duration: </label>
+                    <input type="number" name="min_duration" placeholder="Min" min="0" value="{{work_filters.get('min_duration', '') }}">
+                    <span> to </span>
+                    <input type="number" name="max_duration" placeholder="Max" min="0" value="{{ work_filters.get('max_duration', '') }}">
+                </div>
+
+                <input type="submit" value="Apply">
+                <a href="/movies{% if status and status != 'all' %}/{{ status }}{% endif %}" class="clear">Clear Filters</a>
+            </form>
+
+        {% block main %}{% endblock %}
+        </main>
+
+        <footer>
+            <p>@Thanakshaya Sathasivam 2026</p>
+        </footer>
+    </body>
+</html>

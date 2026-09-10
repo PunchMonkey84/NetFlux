@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h2>{{ title }}</h2>
+<table>
+    <tr>
+        <th><a href="/sort/Title?order={{ order }}&status={{ status }}">Title</a></th>
+        <th><a href="/sort/Director_Fname?order={{ order }}&status={{ status }}">Director</a></th>
+        <th><a href="/sort/Genre?order={{ order }}&status={{ status }}">Genre</a></th>
+        <th><a href="/sort/Duration?order={{ order }}&status={{ status }}">Duration</a></th>
+        <th>Description</th>
+    </tr>
+    {% for movie in movies %}
+    <tr>
+        <td><strong>{{ movie['Title'] }}</strong></td>
+        <td>{{ movie['Director_Fname'] }} {{ movie['Director_Lname'] }}</td>
+        <td>{{ movie['Genre'] }}</td>
+        <td>{{ movie['Duration'] }} mins</td>
+        <td>{{ movie['Description'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

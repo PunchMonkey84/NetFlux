@@ -1,143 +1,1100 @@
+/* Setting the main page style setup */
+
+* {
+    padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
+    display: flex;
     background-color: black;
     color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    width: 75%;
-    margin: auto;
-    display: grid;
-    grid-template-columns: 1fr 4fr;
+    font-optical-sizing: auto;
+    font-style: normal;
+    flex-direction: column;
+    min-height: 100vh;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('../images/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
-header{
-    background-color: grey;
-    padding: 10px;
-    margin: 0;
-    grid-column: 1/3;
-    font-weight: bolder;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-nav {
-    background-color: #45434a;
-    padding: 20px;
-    min-height: 80vh;
-}
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-nav li {
-    margin-bottom: 12px;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-form {
-    border: 1px solid white;
-    padding: 5px;
-    margin: 5px;
-}
-
-.filter-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 300;
-}
-
-.filter-form select,
-.filter-form input[type="text"] {
-    width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
-    border: 1px solid white;
-    background-color: #888888;
-    color: white;
-    border-radius: 4px;
-}
-
-.filter-form input[type="submit"] {
-    background-color: #777676;
-    color: white;
-    font-weight: bold;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-}
-
-filter-form input[type="submit"]:hover {
-    background-color: #2d191a;
-    color: white;
-}
-
-.duration-filter {
-    display: inline-block;
-    margin: 0px 10px;
-}
-
-.duration-filter input[type="number"] {
-    width: 65px;
-    padding: 5px;
-    background-color: #1e1e21;
-    color: white;
-    border: 1px solid white;
-    border-radius: 2px;
-}
-
-.clear {
-    display: inline block;
-    margin-left: 10px;
-    color: #ff6b6f;
-    text-decoration: underline;
-    font-size: 15px;
-}
-
-.clear:hover {
-    color: white;
+/* Set the page wrapper */
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 main {
-    padding: 20px;
-    background-color: black;
+    flex: 1;
 }
 
-table {
+
+/* Styling the navigation bar */
+.navbar {
     width: 100%;
-    border-collapse: collapse;
-    background-color: #1e1e20;
-    border: 1px solid white;
+    min-height: 80px;
+    padding: 15px 35px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    background: #120000;
+    box-shadow: 0 4px 6px rgba(48, 0, 0, 0.3);
 }
 
-th {
-    background-color: #888888;
+
+/* Styling the website logo */
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: "Cardo", serif;
+    font-style: normal;
+    color: white;
+    text-decoration: none;
+}
+
+
+/* Arranging the navigation links */
+.navbar-links {
+    display: flex;
+    gap: 15px;
+}
+
+/* Styling navigtaion buttons */
+.navbar-btn {
+    padding: 8px 24px;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: "Cardo", serif;
+    background-color: #1f0202e5;
+    color: white;
+    border-radius: 2px;
+    transition: 0.2s;
+}
+
+.navbar-btn:hover {
+    padding: 7px 23px;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: rgba(68, 17, 17, 0.897);
+    color: white;
+    border-radius: 1px;
+    transform: translateY(-2px);
+}
+
+/* Search and settings positioning */
+.right-navbar {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Positioning search box */
+.search-box {
+    display: flex;
+    align-items: center;
+}
+
+/* Styling the search box */
+.search-box form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-box input {
+    width: 180px;
+    padding: 10px 12px;
+    border: 1px solid #444;
+    border-radius: 7px;
+    background: #1c1c1c;
+    color: #ffffff;
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: #888;
+}
+
+/* Search box button */
+.search-box button {
+    padding: 10px 12px;
+    cursor: pointer;
+    border: 1px solid #444;
+    border-radius: 7px;
+    background: #eee;
+    font-weight: bold;
+    font-family:'Times New Roman', Times, serif;
+    color: #111;
+}
+
+.search-box button:hover {
+    background: #ccc;
+}
+
+
+/* Styling the setting menu */
+.settings {
+    position: relative;
+}
+
+.settings-btn {
+    width: 42px;
+    height: 42px;
+    border: 1px solid #ac6b6b;
+    border-radius: 7px;
+    background: #1c1c1c;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.settings-btn:hover {
+    background: #7c4040;
+}
+
+/* Settings options */
+.settings-options {
+    position: absolute;
+    background: #480606;
+    border: 1px solid #d8d5d5;
+    border-radius: 10px;
+    top: 45px;
+    right: 0;
+    min-width: 160px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.theme-toggle,
+.logout {
+    display: block;
+    padding: 9px;
+    color: white;
+    text-decoration: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+/* Hide setting options dropdown*/
+.hidden {
+    display: none !important;
+}
+
+/* Theme option for changing themes */
+.theme-option {
+    display: block;
+    padding: 9px;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Hovering settings options */
+.theme-option:hover,
+.logout:hover {
+    background: #590b0b;
+}
+
+/* Logout option */
+.logout {
+    display: block;
+    padding: 9px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+
+/* Theme controlling */
+.theme-toggle {
+    display: none;
+}
+
+
+/* Styling the welcome message */
+.welcome-sign {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgb(32, 0, 0);
+    animation: welcomeFade 3s ease forwards;
+}
+
+/* Styling the favicon in welcome message */
+.welcome-favicon {
+    position: absolute;
+    justify-content: center;
+    width: 150px;
+    top: 160px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.sign-content {
+    padding: 30px;
+}
+
+.sign-content h1 {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 65px;
+    font-weight: 400;
+}
+
+.sign-content p {
+    color: #ccc;
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+/* Fading the welcome message */
+@keyframes welcomeFade {
+    0% {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-15px);
+        visibility: hidden;
+    }
+}
+
+
+/* Styling the movie toolbar */
+.toolbar {
+    position: relative;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+
+/* Page title styling */
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    max-width: 65%;
+    margin: 0 auto;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+}
+
+
+/* Filter and sort */
+
+/* Position for filter and sort dropdowns */
+.dropdown {
+    position: relative;
+}
+
+/* Styling the filter and sort button */
+.action-btn {
+    border: none;
+    color: white;
+    background: transparent;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    color: #efb3b3;
+}
+
+
+/* Styling dropdown panels */
+.board-content{
+    padding: 15px;
+    background-color: #4c0909;
+    border: 2px solid #dcc8bc;
+    border-radius: 5px;
+    box-shadow: 0 5px 12px whitesmoke;
+    position: absolute;
+    top: 35px;
+    left: 0;
+    width: 320px;
+    z-index: 100;
+}
+
+.right-aligned {
+    left: auto;
+    right: 0;
+}
+
+.board-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.board-content label {
+    margin: 8px 0 4px;
+    display: block;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* Styling filter inputs */
+.board-content select,
+.board-content input[type="number"] {
+    padding: 8px;
+    background-color: #612323;
+    color: white;
+    border: 2px solid #dcc8bc;
+    border-radius: 3px;
+    width: 100%;
+    outline: none;
+}
+
+/* Arranging duration inputs */
+.duration-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.duration-inputs input {
+    min-width: 80px;
+}
+
+.duration-inputs span {
+    color: #fff;
+}
+
+
+/* Styling form buttons */
+.apply-btn,
+.recommend-btn {
+    padding: 8px;
+    background-color: #761202;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 3px;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+/* Styling apply button */
+.apply-btn {
+    margin-top: 8px;
+    background: white;
+    color: #e243a6;
+}
+
+.apply-btn:hover {
+    background: #ddd;
+}
+
+/* Styling reccomend button */
+.recommend-btn {
+    background: #e894ad;
+    color: #fff4f4;
+}
+
+.recommend-btn:hover {
+    background: #b37f7f;
+    color: #fff;
+}
+
+/* Styling clear filter button */
+.clear-btn {
+    color: #ff5555;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.clear-btn:hover {
+    color: #fff;
+    background: #292829;
+}
+
+
+/* Styling the recommendation movie */
+.recommendation {
+    position: fixed;
+    padding: 20px;
+    display: flex;
+    background: rgba(0, 0, 0, 0.82);
+    align-items: center;
+    justify-content: center;
+    animation: popupFade 0.3s ease;
+    inset: 0;
+    z-index: 200;
+}
+
+/* Styling the recommendation box */
+.recommendation-content {
+    padding: 30px;
+    position: relative;
+    background: #310202;
+    border: 1px solid #c2b3b3;
+    border-radius: 16px;
+    width: min(450px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+/* Animating the recommendation popup */
+@keyframes popupFade {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+} 
+
+/* Styling the close button */
+.recommend-close {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 12px;
+    right: 15px;
+}
+
+.recommend-close:hover {
+    background: #5d2323;
+}
+
+
+/* Styling recommendation */
+
+/* Styling recommendation heading */
+.recommend-header {
+    color: #ffffff;
+    font-size: 14px;
+    font-family: "Cardo", serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Styling recommendation poster */
+.recommend-poster {
+    width: 190px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Styling recommendation movie title */
+.recommendation-content h2 {
+    margin: 18px 0 12px;
+    font-family: "Cardo", serif;
+    font-weight: 700;
+    font-size: 25px;
+}
+
+/* Styling recommendation movie information */
+.recommendation-content > p {
+    font-family: "Cardo", serif;
+    color: #ffffff;
+    margin: 7px 0;
+}
+
+.recommendation-content strong {
+    color: #fff;
+}
+
+/* Styling recommendation description */
+.recommend-description {
+    color: #fff !important;
+    margin: 18px 0 !important;
+    line-height: 1.6;
+}
+
+/* Styling recommend again button */
+.recommend-again-btn{
+    display: inline-block;
+    padding: 11px 20px;
+    margin-top: 8px;
+    background: #fff;
+    color: #111;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.recommend-again-btn:hover {
+    background: #ddd;
+}
+
+
+/* Creating main grid for movies */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
+    padding: 40px;
+}
+
+/* Setting the size of movie cards */
+.card-container {
+    aspect-ratio: 2 / 3;
+    perspective: 1000px;
+}
+
+/* Creating the flipping card */
+.card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+/* Flipping the card */
+.card-container:hover .card {
+    transform: rotateY(180deg);
+}
+
+/* Styling both sides of the movie card */
+.front-card, .back-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    border: 1px solid rgba(159, 126, 61, 1);
+    backface-visibility: hidden;
+    overflow: hidden;
+    box-shadow: 5px 5px 10px rgba(197, 176, 138, 0.197);
+}
+
+/* Styling the front side of the card */
+.front-card {
+    background: #222;
+}
+
+/* Styling the front card poster */
+.front-card img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-color: black;
+    border: 2vh solid #5a3f06;
+    border-radius: 5px;
+    box-shadow: inset 0 0 0 2px #594411,
+    inset 0 0 0 6px #4c390c,
+    0 8px 16px rgba(181, 156, 75, 0.8);
+}
+
+
+/* Styling the back of the card */
+.back-card {
+    padding: 15px;
+    background-color: #420e00;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    transform: rotateY(180deg);
+}
+
+/* Styling the back of the card's headings */
+.back-card h3 {
+    color: #ff6b6f;
+    font-size: 25px;
+    font-family: "Fleur De Leah", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Styling the descripiton of the movie at the back of the card */
+.back-card .description {
+    font-size: 11px;
+    font-family: "Cardo", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    opacity: 0.85;
+}
+
+
+/* Styling the footer of website */
+footer {
+    padding: 15px;
+    background-color: #0d0d0d;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+
+/* Styling the login page */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Styling the login box */
+.login-box {
+    padding: 35px;
+    background-color: rgba(0, 0, 0, 0.089);
+    border: 1px solid #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 0 30px rgba(231, 230, 230, 0.288);
+}
+
+/* Styling login heading */
+.login-box h2 {
+    font-size: 25px;
+    margin-bottom: 25px;
+}
+
+/* Styling login form for all parts */ 
+.form-group {
+    margin-bottom: 8px;
+    flex-direction: column;
+    display: flex;
+}
+
+/* Styling form labels */
+.form-group label {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: "Cardo", serif;
+    color: #ccc;
+    margin-bottom: 8px;
+}
+
+/* Styling feedback box of login form */
+.form-group input,
+.form-group textarea {
+    padding: 12px;
+    background-color: #cdcdcd;
+    color: white;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    width: 100%;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #666666;
+}
+
+/* Styling submit button */
+.submit-btn {
+    padding: 14px;
+    background-color: white;
     color: black;
-    border: 1px solid white;
-    padding: 10px;
-    text-align: left;
+    border: none;
+    border-radius: 25px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
 }
 
-td {
-    border: 1px solid white;
-    padding: 10px;
+.submit-btn:hover {
+    background-color: rgb(45, 11, 11);
     color: white;
 }
 
-footer {
-    grid-column: 1/3;
-    background-color: #1a1a1a;
-    padding: 10px 20px;
-    font-size: 14px;
-    font: bold;
+/* Changing to Pink theme */
+
+/* Background of website */
+#theme-toggle:checked ~ .wrapper {
+    background-image: url('../images/background2.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #f7bae7;
+}
+
+/* Navigation Bar of website */
+#theme-toggle:checked ~.wrapper .navbar {
+    background-color:  #f988c8;
+    border: none;
+    box-shadow: 0 4px 6px rgba(255, 117, 198, 0.438)   ;
+}
+
+/* Navigation buttons of website */
+#theme-toggle:checked ~ .wrapper .navbar-btn {
+    background-color: #ffa8d4;
+}
+
+/* Search box of website */
+#theme-toggle:checked ~ .wrapper .right-navbar .search-box {
+    border: none;
+}
+
+/* Search input of website */
+#theme-toggle:checked ~ .wrapper .search-box input {
+    background-color: #ffffff;
+    color: #ffcbcb;
+    border-color: #f790e2;
+}
+
+#theme-toggle:checked ~ .wrapper .search-box input::placeholder {
+    color: #f790e2;
+}
+
+#theme-toggle:checked ~ .wrapper .search-box input:focus {
+    background-color: #ffffff;
+    color: #f790e2;
+}
+
+/* Search button of website */
+#theme-toggle:checked ~ .wrapper .right-navbar .search-box button {
+    background-color: #ffffff;
+    border: none;
+    color: #f790e2;
+}
+
+/* Movie card grid of website */
+#theme-toggle:checked ~ .wrapper .movie-grid .card {
+    color: white;
+}
+
+/* Movie cards of website */
+#theme-toggle:checked ~ .wrapper .card {
+    border-color: #dddb92;
+}
+
+/* Movie cards frames */
+#theme-toggle:checked ~ .wrapper .card .front-card img {
+    border: 2vh solid #c29b48;
+}
+
+/* Back of movie cards */
+#theme-toggle:checked ~ .wrapper .back-card {
+    background-color: #f988c8;
+}
+
+#theme-toggle:checked ~ .wrapper .back-card h3 {
+    color: #ffffff;
+}
+
+/* Filter and sort dropdown menu */
+#theme-toggle:checked ~ .wrapper .toolbar .dropdown .board-content select,
+#theme-toggle:checked ~ .wrapper .toolbar .dropdown .board-content input[type="number"] {
+    background-color: #e396d2;
+    border: 2px solid #e4dbe2;
+}
+
+#theme-toggle:checked ~ .wrapper .toolbar .dropdown .board-content {
+    background-color: #ef9ace;
+    border: 2px solid #e4dbe2;
+}
+
+/* Filter and Sort submit button */ 
+#theme-toggle:checked ~ .wrapper .toolbar .dropdown .board-content .action-btn {
+    background-color: #f1cbe9;
+    border: 2px solid #e4dbe2;
+}
+
+/* Filter Clear button */
+#theme-toggle:checked ~ .wrapper .toolbar .dropdown .board-content .clear-btn:hover {
+    background-color: #f790e2;
+    color: #ffffff;
+}
+
+/* Recommended movie card background */
+#theme-toggle:checked ~ .wrapper .recommendation-content {
+    background: #e778b9;
+    color: #ffffff;
+    box-shadow: 0 20px 60px rgba(244, 243, 244, 0.438);
+}
+
+/* Recommended movie card movie poster */
+#theme-toggle:checked ~ .wrapper .recommendation-content .recommend-poster {
+    box-shadow: 0 10px 30px #e1dcdf70;
+}
+
+/* Setting options menu */
+#theme-toggle:checked ~ .wrapper .settings-options {
+    background-color: #f988c8;
+    color: #f790e2;
+    box-shadow: 0 10px 30px rgba(255, 117, 198, 0.438);
+}
+
+#theme-toggle:checked ~ .wrapper .settings-options .theme-option:hover, 
+#theme-toggle:checked ~ .wrapper .settings-options .logout:hover{
+    background-color: #f790e2;
+    color: #ffffff;
+}
+
+/* Welcome message sign */
+#theme-toggle:checked ~ .wrapper .welcome-sign {
+    background: #f3b8db;
+}
+
+#theme-toggle:checked ~ .wrapper .welcome-sign .sign-content p {
+    color: #ffffff;
+}
+
+/* Footer of website */
+#theme-toggle:checked ~ .wrapper footer {
+    background-color: #f3b8db;
+}
+
+/* Login form of website */
+#theme-toggle:checked ~ .wrapper .form-group label {
+    color: #fff;
+}
+
+#theme-toggle:checked ~ .wrapper .form-group input,
+#theme-toggle:checked ~ .wrapper .form-group textarea {
+    background-color: #efb8d5;
+    color: #000;
+    border: 1px solid #e4dbe2;
+}
+
+/* Submit login button */
+#theme-toggle:checked ~ .wrapper .submit-btn{
+    background-color: #f485ba;
+    color: #ffffff;
+}
+
+#theme-toggle:checked ~ .wrapper .submit-btn:hover {
+    background-color: #f1c2d6;
+    color: #4a032b;
+}
+
+/* Makes the website responsive on tablets, phones and smaller screens */
+@media screen and (max-width: 900px) {
+
+    /* Allows the navigation bar to move onto mulitple rows */
+    .navbar {
+        flex-wrap: wrap;
+        padding: 15px 20px;
+        gap: 15px;
+    }
+
+    /* Keeps navigation links together */
+    .navbar-links {
+        flex-wrap: wrap;
+    }
+
+    /* Moves the search and setting below the navigation links */
+    .right-navbar {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    /* Allows the search to use the avaible space */
+    .search-box {
+        flex: 1;
+    }
+
+    .search-box form {
+        width: 100%;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+
+    /* Allows filter, title, and sort controls to wrap */
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: 20px;
+    }
+
+    /* Gives the page title a row */
+    .page-title {
+        width: 100%;
+        max-width: 100%;
+        order: 2;
+    }
+
+    /* Changes movie grid from 5 columns to 3 */
+    .movie-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 25px;
+    }
+}
+
+/* Makes the website responsive on phones */
+@media screen and (max-width: 650px) {
+
+    /* Stacks the navigation contant for smaller screens */
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+    }
+
+    /* Centering the logo of website */
+    .logo {
+        text-align: center;
+    }
+
+    /* Centering the navigation links */
+    .navbar-links {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .navbar-btn {
+        padding: 8px 14px;
+    }
+
+    /* Keeps search and setting on one row */
+    .right-navbar {
+        display: flex;
+        width: 100%;
+    }
+
+    .search-box {
+        flex: 1;
+    }
+
+    .search-box form {
+        width: 100%;
+    }
+
+    .search-box input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Keeps filter and sort button above title */
+    .toolbar {
+        margin: 18px 15px;
+        gap: 15px;
+    }
+
+    .toolbar .dropdown {
+        flex: 1;
+    }
+
+    .toolbar .dropdown:last-child {
+        text-align: right;
+    }
+
+    .page-title {
+        font-size: 22px;
+        font-family: "Cardo", serif;
+        font-weight: 700;
+        order: 2;
+    }
+
+    /* Makes dropdown panels fit small screens */
+    .board-content {
+        width: min(300px, 85vw);
+    }
+
+    /* Changes movie grid to two columns */
+    .movie-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        padding: 15px;
+    }
+
+    /* Reduces the movie frame size */
+    .front-card img {
+        border-width: 10px;
+    }
+
+    .back-card {
+        padding: 10px;
+        font-size: 12px;
+        gap: 5px;
+    }
+
+    .back-card h3 {
+        font-size: 20px;
+    }
+
+    .back-card .description {
+        font-size: 10px;
+    }
+
+    /* Makes recommendation popup fit the phone screen */
+    .recommendation {
+        padding: 12px;
+    }
+
+    .recommendation-content {
+        width: 95%;
+        padding: 22px;
+    }
+
+    .recommend-poster {
+        width: 150px;
+        height: 220px;
+    }
+
+    /* Makes the welcome message fit smaller screens */
+    .sign-content h1 {
+        font-size: 45px;
+    }
+
+    .welcome-favicon {
+        width: 110px;
+        height: 110px;
+    }
+
+    /* Reduces footer size */
+    footer {
+        font-size: 18px;
+    }
 }

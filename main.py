@@ -1,259 +1,409 @@
-## Movie Website ##
-# This a person movie website that stores watched and watchlist movies.
+# NetLux movie databse website #
+"""NetLux is a personal movie website that helps find movies."""
 
+# Importing Flask tools for routes, form, sessions, and redirects
+from flask import Flask, render_template, request, redirect, session, url_for
 
-# Importing Flask
-from flask import Flask, render_template, request
+# Keeps function info when using login
+from functools import wraps
 
-# Importing database
-import sqlite3 
-from sqlite3 import Error
+# Connects to the SQLite3 database
+import sqlite3
 
+# Creates a Flask application
 app = Flask(__name__)
 
-# Database file path
+# The Secret key to securely store information of session
+app.secret_key = "key_for_netlux"
+
+# Login details
+EMAIL = "123@netlux.com"
+PASSWORD = "123password"
+
+# Tracking when the server started
+server_started = False
+
+# SQLite3 Database file
 DATABASE = "movie.db"
 
-# Database functions 
 
-
-def create_connection(db_file):
+def get_db_connection():
     """
     Create a connection to SQLite database.
+
     Add a row_factory to sqlite3.Row to allow getting columns by key names.
     """
+    # Connects to the database
+    conn = sqlite3.connect(DATABASE)
 
-    conn = None
+    # Allows database values to be accessed by their column name
+    conn.row_factory = sqlite3.Row
 
-    try:
-        conn = sqlite3.connect(db_file)
-        conn.row_factory = sqlite3.Row
-        return conn
-
-    # Print any error if problem with database
-    except Error as e:
-        print(e)
     return conn
 
-# Query constant combining the 3 tables to find components
-QUERY = """
-SELECT Movie.MovieID,
-Movie.Title,
-Director.Director_Fname,
-Director.Director_Lname,
-Genre.Genre,
-Movie.Duration,
-Movie.Description,
-Movie.Watched_status
-FROM Movie
-INNER JOIN Director ON Movie.DirectorID = Director.DirectorID
-INNER JOIN Genre ON Movie.GenreID = Genre.GenreID
-"""
+
+@app.before_request
+def start_logout():
+    """Clear old session data when server starts."""
+    global server_started
+
+    # Only clears the session when the server first starts
+    if not server_started:
+        session.clear()
+        server_started = True
 
 
-def get_filter():
-    """
-    Get options for a filtering form.
-    """
-    # Connection to database
-    conn = create_connection(DATABASE)
-    cursor = conn.cursor()
+def login_needed(view):
+    """Make sure user logins in before viewing protected data."""
+    @wraps(view)
+    def wrapped(*args, **kwargs):
 
-    # Genre filter options
-    cursor.execute("SELECT DISTINCT Genre From Genre ORDER BY Genre")
-    genres = [row['Genre'] for row in cursor.fetchall()]
+        # Redirect users to login if they are not
+        if not session.get('logged_in'):
+            return redirect(url_for('login'))
 
-    # Director filter options
-    cursor.execute("SELECT DISTINCT Director_Fname || ' ' || Director_Lname AS FullName FROM Director ORDER BY FullName")
-    directors = [row['FullName'] for row in cursor.fetchall()]
+        # Continue to the page if login is valid
+        return view(*args, **kwargs)
 
-    # Getting filter options
-    conn.close()
-    return {
-        'genres': genres,
-        'directors': directors
-    }
+    return wrapped
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Check the user's email and password is correct to allow access."""
+    # Start the login with a cleared session
+    session.clear()
+
+    # No error message is displayed at the start
+    error = None
+
+    # Only process login details if form is submitted
+    if request.method == 'POST':
+
+        # Get the inputted email and password
+        user_email = request.form.get('email')
+        user_password = request.form.get('password')
+
+        # Check if inputted details are correct
+        if user_email == EMAIL and user_password == PASSWORD:
+
+            # Keep the user's login session active
+            session.permanent = True
+
+            # Record that user is logged in
+            session['logged_in'] = True
+
+            # Show the welcome the screen after login
+            session['show_welcome'] = True
+
+            # Move user to the movie page
+            return redirect(url_for('index'))
+
+        # Display an error if any details are incorrect
+        else:
+            error = "Invalid email address or password."
+
+    # Display the login page
+    return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    """Log the user out and moves them to the login page."""
+    # Removes all saved session information
+    session.clear()
+
+    # Returns to the Login page
+    return redirect(url_for('login'))
+
 
 @app.route('/')
-@app.route('/movies')
-@app.route('/movies/<status>')
-def render_filtered(status=None):
+@login_needed
+def index():
     """
-    Handle movie listing and filtering.
-    """
-    # Grab query parameters submitted from the HTML filter form
-    chosen_genre = request.args.get('genre')
-    chosen_director = request.args.get('director')
-    mini_duration = request.args.get('min_duration')
-    maxi_duration = request.args.get('max_duration')
+    Display movies from the database.
 
-    # Store raw choices in a filter dictionary
-    raw_filters = {
-        'genre': chosen_genre,
-        'director': chosen_director,
-        'min_duration':mini_duration,
-        'max_duration': maxi_duration
+    Handles sorting, searching, filtering, and recommendations.
+    """
+    # Open the database
+    conn = get_db_connection()
+
+    # Show the welcome sign after successful login
+    show_welcome = session.pop('show_welcome', False)
+
+    # Get search option with text entered
+    search_q = request.args.get('search', '').strip()
+
+    # Get watch status option from URL
+    status = request.args.get('status', '')
+
+    # Get sorting options
+    # Get selected sorting field
+    sort_by = request.args.get('sort_by', 'Title')
+
+    # Get sorting direction
+    order = request.args.get('order', 'ASC')
+
+    # Get filter options
+    # Get genre
+    select_genre = request.args.get('genre', '')
+
+    # Get director
+    select_director = request.args.get('director', '')
+
+    # Get duration
+    # Get minimum duration
+    min_dur = request.args.get('min_duration', '')
+    # Get maximum duration
+    max_dur = request.args.get('max_duration', '')
+
+    # Get recommendation option
+    # Check whether the user requested a random movie
+    recommend = request.args.get('recommend', '')
+
+    # Checking sort values
+    # Check allowed sorting options
+    valid_sorts = ['Title', 'Director_Fname', 'Genre', 'Duration']
+
+    # If Invalid option to sort, sort by title as default
+    if sort_by not in valid_sorts:
+        sort_by = 'Title'
+
+    # Only allow ASC or DESC order
+    if order.upper() not in ['ASC', 'DESC']:
+        order = 'ASC'
+
+    # Make order uppercase
+    order = order.upper()
+
+    # Making the movie query
+    # Join the Movie, Director and Genre tables.
+    query = """
+    SELECT
+    Movie.MovieID,
+    Movie.Title,
+    Director.Director_Fname,
+    Director.Director_Lname,
+    Genre.Genre,
+    Movie.Duration,
+    Movie.Description,
+    Movie.Watched_status,
+    CAST(Movie.Movie_poster AS TEXT) AS Movie_poster
+
+    FROM Movie
+
+    INNER JOIN Director
+    ON Movie.DirectorID = Director.DirectorID
+
+    INNER JOIN Genre
+    ON Movie.GenreID = Genre.GenreID
+
+    WHERE 1=1
+    """
+
+    # Stores values that are safely passed into the SQL query
+    params = []
+
+    # Filter by genre
+    # Only show movies from the selected genre
+    if select_genre:
+
+        query += " AND Genre.Genre = ?"
+
+        # Adds the selected genre to query to the parameters
+        params.append(select_genre)
+
+    # Filter by director
+    # Only show movies from selected director
+    if select_director:
+
+        query += " AND Movie.DirectorID = ?"
+
+        # Add DirectorID to query parameters
+        params.append(select_director)
+
+    # Filter by minimum duration
+    # Only show movies at least this many minutes long
+    if min_dur:
+        query += " AND Movie.Duration >= ?"
+
+        # Add minimum duration to query to the parameters
+        params.append(min_dur)
+
+    # Filter by maximum duration
+    # Only show movies no longer than this many minutes
+    if max_dur:
+        query += " AND Movie.Duration <= ?"
+
+        # Add maximum duration to query parameters
+        params.append(max_dur)
+
+    # Search for movies using any database column
+    if search_q:
+
+        query += """
+        AND (
+            Movie.Title LIKE ?
+            OR Director.Director_Fname LIKE ?
+            OR Director.Director_Lname LIKE ?
+            OR Genre.Genre LIKE ?
+            OR CAST(Movie.Duration AS TEXT) LIKE ?
+            OR Movie.Description LIKE ?
+            OR CAST(Movie.Watched_status AS TEXT) LIKE ?
+        )
+        """
+
+        # Add the same search term for each searchable column
+        search_term = f"%{search_q}%"
+
+        # Allows the search text to appear anywhere in the title
+        params.extend([
+            search_term,
+            search_term,
+            search_term,
+            search_term,
+            search_term,
+            search_term,
+            search_term
+            ])
+
+    # Watch Status
+    # Get Watchlist movies
+    if status == 'watchlist':
+        query += " AND Movie.Watched_status = 0"
+
+    # Get Watched movies
+    elif status == 'watched':
+        query += " AND Movie.Watched_status = 1"
+
+    # Random recommendation or sorting
+
+    # Get one movie from the current filtered results
+    if recommend == '1':
+        query += """
+        ORDER BY RANDOM()
+        LIMIT 1
+        """
+
+    else:
+        # Sort the matching movies using the selected column and direction
+        query += f" ORDER BY {sort_by} {order}"
+
+    # Run the movie query
+    # Execute the completed SQL query
+    movies = conn.execute(query, params).fetchall()
+
+    # Get Genres
+    # Get genres for the filter dropdown
+    genres = conn.execute("""
+    SELECT DISTINCT Genre FROM Genre
+    ORDER BY Genre ASC
+    """).fetchall()
+
+    # Get Directors
+    # Get directors for the filter options
+    directors = conn.execute("""
+    SELECT DirectorID, Director_Fname, Director_Lname FROM Director
+    ORDER BY Director_Fname ASC, Director_Lname ASC
+    """).fetchall()
+
+    # Stores the director's name for the page title
+    selected_director = ""
+
+    # Only look for the director name if it was selected
+    if select_director:
+
+        # Find the selected director from dropdown data
+        for director in directors:
+
+            if str(director['DirectorID']) == str(select_director):
+
+                # Combine first and last name
+                selected_director = (
+                    f"{director['Director_Fname']} "
+                    f"{director['Director_Lname']}"
+                )
+
+                break
+
+    # Stores each active option as part of the page title
+    title_parts = []
+
+    # Add the selected watch status
+    if status == 'watchlist':
+        title_parts.append("Watchlist")
+
+    elif status == 'watched':
+        title_parts.append("Watched")
+
+    # Add searched text to title
+    if search_q:
+        title_parts.append(f'Search: "{search_q}"')
+
+    # Add selected genre to title
+    if select_genre:
+        title_parts.append(f"Genre: {select_genre}")
+
+    # Add selected director to title
+    if selected_director:
+        title_parts.append(f"Director: {selected_director}")
+
+    # Add selected duration range to title
+    if min_dur and max_dur:
+        title_parts.append(f"Duration: {min_dur}-{max_dur} mins")
+
+    # If only minimum duration is selected add to title
+    elif min_dur:
+        title_parts.append(f"Duration: {min_dur}+ mins")
+
+    # If only maximum duration is selected add to title
+    elif max_dur:
+        title_parts.append(f"Duration: up to {max_dur} mins")
+
+    # Names for each sorting field
+    sort_names = {
+        'Title': 'Title',
+        'Director_Fname': 'Director',
+        'Genre': 'Genre',
+        'Duration': 'Duration'
     }
 
-    # Remove empty values and default
-    work_filters = {k: v for k, v in raw_filters.items() if v and v != 'all'}
+    # Only shows sorting in title if sorting selected
+    if request.args.get('sort_by'):
 
-    query = QUERY
-    params = []
-    where = []
+        # Arrows representing order
+        if order == 'ASC':
+            sort_arrow = "↑"
 
-    # Make a where and params list where conditions are met
-    if 'genre' in work_filters:
-        where.append("Genre.Genre = ?")
-        params.append(work_filters['genre'])
+        else:
+            sort_arrow = "↓"
 
-    if 'director' in work_filters:
-        where.append("Director.Director_Fname || ' ' || Director.Director_Lname = ?")
-        params.append(work_filters['director'])
+        title_parts.append(f"Sorted by {sort_names[sort_by]} {sort_arrow}")
 
-    # For duration filter, convert text to numeric for comparison
-    if 'min_duration' in work_filters:
-        where.append("CAST(Movie.Duration AS INTEGER) >= ?")
-        params.append(int(work_filters['min_duration']))
+    # Default title NetLux
+    if not title_parts:
+        page_title = "NetLux"
 
-    if 'max_duration' in work_filters:
-        where.append("CAST(Movie.Duration AS INTEGER) <= ?")
-        params.append(int(work_filters['max_duration']))
+    else:
+        page_title = " ~ ".join(title_parts)
 
-    # Filter navigation for watched and watchlist movies
-    if status in ['0', 'watchlist']:
-        where.append("Movie.Watched_status = 0")
-    elif status in ['1', 'watched']:
-        where.append("Movie.Watched_status = 1")
-
-    # Use active conditions and logic
-    if where:
-        query += " WHERE " + " AND ".join(where)
-
-    # Query against SQLite database
-    conn = create_connection(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute(query, params)
-    movie_list = cursor.fetchall()
+    # All database work is finished
     conn.close()
 
-    # Page title for jinja display depending on what page
-    if status in ['0', 'watchlist']:
-        page_title = "Watchlist Movies"
-    elif status in ['1', 'watched']:
-        page_title = "Watched Movies"
-    elif work_filters:
-        page_title = "Filtered Movies"
-    else:
-        page_title = "All Movies"
-
-    # Use HTML template to pass the input dataset
+    # Display movie page
+    # Send all data to movies.html
     return render_template(
         'movies.html',
-        movies=movie_list,
+        movies=movies,
+        genres=genres,
+        directors=directors,
         title=page_title,
-        filter_options=get_filter(),
-        work_filters=work_filters,
-        order='asc',
-        status=status or 'all'
-    )
-
-
-@app.route("/search", methods=['GET', 'POST'])
-def search():
-    """
-    Create a global Search bar to find specific movies
-    """
-    if request.method == 'POST':
-        search_item = request.form.get('search', '')
-    else:
-        search_item = request.args.get('search', '')
-
-    # Get each search key with wildcard
-    wildcard_search = f"%{search_item}%"
-
-    #SQLite query search using database columns
-    query = f"""
-    {QUERY} 
-    Where (Movie.Title LIKE ? 
-    OR Director.Director_Fname LIKE ? 
-    OR Director.Director_Lname LIKE ? 
-    OR Genre.Genre LIKE ? 
-    OR Movie.Duration LIKE ? 
-    OR Movie.Description LIKE ?)
-    """
-
-    conn = create_connection(DATABASE)
-    cursor = conn.cursor()
-    # Use parameters to bind each wildcard placeholder
-    cursor.execute(query, (wildcard_search, wildcard_search, wildcard_search, wildcard_search, wildcard_search, wildcard_search))
-    movie_list = cursor.fetchall()
-    conn.close()
-
-    return render_template(
-        'movies.html', 
-        movies=movie_list, 
-        title=f"Search Results for '{search_item}'", 
-        order='asc', 
-        status='all',
-        filter_options=get_filter(),
-        work_filters={}
+        show_welcome=show_welcome,
+        sortby=sort_by,
+        order=order
         )
 
 
-@app.route('/sort/<col_name>')
-def render_sortpage(col_name):
-    """
-    Handle column sorting when table header is clicked
-    """
-    order = request.args.get('order', 'asc')
-    status = request.args.get('status', 'all')
-
-    # when clicked change order of sort direction
-    sql_order = 'ASC' if order == 'asc' else 'DESC'
-    new_order = 'desc' if order == 'asc' else 'asc'
-
-    # Validate whether a column can be sorted
-    valid_columns = ['Title','Director_Fname', 'Genre', 'Duration']
-    if col_name not in valid_columns:
-        col_name= 'Title'
-
-    # Apply status filter to make sure there is still active context while sorting
-    if str(status) == '0' or str(status).lower() == 'watchlist':
-        sql_where = "WHERE Movie.Watched_status = 0"
-        status_label = "Watchlist"
-    elif str(status) == '1' or str(status).lower() == 'watched':
-        sql_where = "WHERE Movie.Watched_status = 1"
-        status_label = "Watched"
-    else:
-        sql_where = ""
-        status_label = "All"
-
-    # Validate Director column to sort
-    if col_name == 'Director_Fname':
-        query = f"{QUERY} {sql_where} ORDER BY Director_Fname {sql_order}, Director_Lname {sql_order}"
-        display_name = 'Director'
-    else:
-        query = f"{QUERY} {sql_where} ORDER BY {col_name} {sql_order}"
-        display_name = col_name
-
-    # Run sorted database query
-    conn = create_connection(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute(query)
-    movie_list = cursor.fetchall()
-    conn.close()
-
-    return render_template(
-        'movies.html', 
-        movies=movie_list, 
-        title=f"{status_label} Movies Sorted by {display_name} ({sql_order})", 
-        order=new_order, 
-        status=status,
-        filter_options=get_filter(),
-        work_filters={}
-        )
-    
 # Run website
 if __name__ == '__main__':
     # Run Flask on port 5000 with auto debug

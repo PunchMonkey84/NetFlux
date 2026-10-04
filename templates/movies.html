@@ -1,23 +1,285 @@
 {% extends "base.html" %}
 
 {% block main %}
-<h2>{{ title }}</h2>
-<table>
-    <tr>
-        <th><a href="/sort/Title?order={{ order }}&status={{ status }}">Title</a></th>
-        <th><a href="/sort/Director_Fname?order={{ order }}&status={{ status }}">Director</a></th>
-        <th><a href="/sort/Genre?order={{ order }}&status={{ status }}">Genre</a></th>
-        <th><a href="/sort/Duration?order={{ order }}&status={{ status }}">Duration</a></th>
-        <th>Description</th>
-    </tr>
+
+<!-- Displays welcome message after successful login -->
+{% if show_welcome %}
+
+<div class="welcome-sign">
+
+    <!-- Favicon in welcome message -->
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Favicon" class="welcome-favicon">
+
+    <div class="sign-content">
+        <h1>Welcome Luxshaya</h1>
+        <p>Your personal movie collection</p>
+    </div>
+
+</div>
+
+{% endif %}
+
+<!-- Contains the filter, title and sorting controls -->
+<div class="toolbar">
+
+    <!-- Filter controls dropdown -->
+    <div class="dropdown">
+
+        <button type="button" class="action-btn" onclick="togglePanel('filter-board')"> ☷ Filter</button>
+        
+        <!-- Filter opions -->
+        <div id="filter-board" class="board-content hidden">
+
+            <!-- Filter options - genre, director, duration-->
+            <form action="/" method="GET">
+                
+                <!-- Genre Filtered movies -->
+                <label for="genre">Genre: </label>
+                <select name="genre" id="genre">
+                    
+                    <option value="">All Genres</option>
+
+                    {% for g in genres %}
+
+                    <option value="{{ g['Genre'] }}"
+
+                    {% if request.args.get('genre') == g['Genre'] %}selected{% endif %}>{{ g['Genre'] }}</option>
+                    {% endfor %}
+                </select>
+
+                <!--Director Filtered movies-->
+                <label for="director">Director: </label>
+                <select name="director" id="director">
+
+                    <option value="">All Directors</option>
+
+                    {% for d in directors %}
+
+                    <option value="{{ d['DirectorID'] }}"
+                    {% if request.args.get('director') == d['DirectorID']|string %}selected{% endif %}>{{ d['Director_Fname'] }} {{ d['Director_Lname'] }}</option>
+                    {% endfor %}
+
+                </select>
+
+                <!-- Duration range Filtered movies -->
+                <label>Duration: </label>
+                <div class="duration-inputs">
+
+                    <input 
+                    type="number" 
+                    name="min_duration" 
+                    placeholder="Min" 
+                    min="0" 
+                    value="{{ request.args.get('min_duration', '') }}"
+                    >
+                    <span>to</span>
+
+                    <input 
+                    type="number" 
+                    name="max_duration" 
+                    placeholder="Max" 
+                    min="0" 
+                    value="{{ request.args.get('max_duration', '') }}"
+                    >
+                </div>
+
+                <!-- Keep search active while filtering -->
+                <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+
+                <!-- Keep status active while filtering -->
+                <input type="hidden" name="status" value="{{ request.args.get('status', '') }}">
+
+                <!-- Applies selected filters -->
+                <button type="submit" class="apply-btn">Apply</button>
+
+                <!-- Gets a random movie in the database using current filters -->
+                <button type="submit" name="recommend" value="1" class="recommend-btn">Recommend a Movie</button>
+
+                <!-- Clears all active filters -->
+                <a href="/" class="clear-btn">❌ Clear Filters</a>
+
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Tile that displays current page state -->
+    <h1 class="page-title">{{ title }}</h1>
+
+    <!-- Sorting controls dropdown -->
+    <div class="dropdown">
+
+        <button type="button" class="action-btn" onclick="togglePanel('sort-board')">⇵ Sort</button>
+
+        <div id="sort-board" class="board-content hidden right-aligned">
+
+            <form action="/" method="GET">
+
+                <label for="sort_by">Sort:</label>
+                <select name="sort_by" id="sort_by">
+
+                    <option value="Title" {% if request.args.get('sort_by', 'Title') == 'Title' %}selected{% endif %}>Title</option>
+
+                    <option value="Director_Fname" {% if request.args.get('sort_by') == 'Director_Fname' %}selected{% endif %}>Director</option>
+
+                    <option value="Genre" {% if request.args.get('sort_by') == 'Genre' %}selected{% endif %}>Genre</option>
+
+                    <option value="Duration" {% if request.args.get('sort_by') == 'Duration' %}selected{% endif %}>Duration</option>
+                    
+                </select>
+
+                <!-- Chooses ASC or DESC sorting -->
+                <label for="order">Order:</label>
+
+                <select name="order" id="order">
+                    <option value="ASC" {% if request.args.get('order') == 'ASC' %}selected{% endif %}>↑</option>
+                    <option value="DESC" {% if request.args.get('order') == 'DESC' %}selected{% endif %}>↓</option>
+                </select>
+
+                <!-- Keeps filters, status, search active while sorting -->
+                <input type="hidden" name="genre" value="{{ request.args.get('genre', '') }}">
+
+                <input type="hidden" name="director" value="{{ request.args.get('director', '') }}">
+
+                <input type="hidden" name="min_duration" value="{{ request.args.get('min_duration', '') }}">
+
+                <input type="hidden" name="max_duration" value="{{ request.args.get('max_duration', '') }}">
+
+                <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+
+                <input type="hidden" name="status" value="{{ request.args.get('status', '') }}">
+
+                <!-- Applies the selected sorting -->
+                <button type="submit" class="apply-btn">Apply</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Shows a random movie recommendation when requested -->
+{% if request.args.get('recommend') == '1' %}
+    {% if movies %}
+
+    <div class="recommendation">
+
+        <div class="recommendation-content">
+
+            <!-- Closes the recommendation while keeping the current query -->
+            <a href="{{ url_for('index') }}" class="recommend-close">x</a>
+            
+            <!-- Recommend card header -->
+            <p class="recommend-header">Your Movie Recommendation</p>
+            
+            <!-- Recommended movie poster -->
+            <img src="{{ url_for('static', filename='images/' ~ movies[0]['Movie_poster'] ~ '.png')}}" alt="{{ movies[0]['Title'] }}" class="recommend-poster">
+
+            <!-- Recommended movie title -->
+            <h2>{{ movies[0]['Title'] }}</h2>
+
+            <!-- Recommended movie genre -->
+            <p><strong>Genre: </strong>{{ movies[0]['Genre'] }}</p>
+
+            <!-- Recommended movie director -->
+            <p><strong>Director: </strong>{{ movies[0]['Director_Fname'] }}{{ movies[0]['Director_Lname'] }}</p>
+
+            <!-- Recommended movie duration -->
+            <p><strong>Duration: </strong>{{ movies[0]['Duration'] }}</p>
+
+            <!-- Recommended movie description -->
+            <p class="recommend-description">{{ movies[0]['Description'] }}</p>
+
+
+            <!-- Get another recommendation using current filters -->
+            <a href="{{ url_for('index', recommend=1, 
+            genre=request.args.get('genre', ''),
+            director=request.args.get('director', ''),
+            min_duration=request.args.get('min_duration', ''),
+            max_duration=request.args.get('max_duration', ''),
+            search=request.args.get('search', ''),
+            status=request.args.get('status', '')
+            ) }}" 
+            class="recommend-again-btn">
+            Recommend Again</a>
+        </div>
+    </div>
+
+    {% else %}
+
+<!-- Displays when no movie matches the current filters -->
+    <div class="recommendation">
+
+        <div class="recommendation-content">
+
+            <a href="{{ url_for('index') }}" class="recommend-close">x</a>
+
+            <h2>No Movies like that</h2>
+            <p>Try changing the filters.</p>
+            
+        </div>
+    </div>
+
+    {% endif %}
+{% endif %}
+
+<!-- Displays every movie returned by the database query -->
+<div class="movie-grid">
+
     {% for movie in movies %}
-    <tr>
-        <td><strong>{{ movie['Title'] }}</strong></td>
-        <td>{{ movie['Director_Fname'] }} {{ movie['Director_Lname'] }}</td>
-        <td>{{ movie['Genre'] }}</td>
-        <td>{{ movie['Duration'] }} mins</td>
-        <td>{{ movie['Description'] }}</td>
-    </tr>
+
+    <!-- Creates one flipping card for each movie -->
+    <div class="card-container">
+
+        <div class="card">
+            
+            <!-- Front of the cards shows the movie poster -->
+            <div class="front-card">
+
+                <img src="{{ url_for('static', filename='images/' ~ movie['Movie_poster'] ~ '.png') }}"
+                alt="{{ movie['Title'] }}"
+                class="poster-img">
+
+            </div>
+
+            <!-- Back of the card shows the movie information -->
+            <div class="back-card">
+                <h3>{{ movie['Title'] }}</h3>
+
+                <p><strong>Genre:</strong> {{ movie['Genre'] }}</p>
+
+                <p><strong>Director:</strong> {{ movie['Director_Fname'] }} {{ movie['Director_Lname'] }}</p>
+
+                <p><strong>Duration:</strong> {{ movie['Duration'] }}</p>
+
+                <p class="description">{{ movie['Description'] }}</p>
+            </div>
+        </div>
+    </div>
     {% endfor %}
-</table>
+</div>
+
+<script>
+
+    // Opens the selected filter or sort panel and closes the other panel
+    function togglePanel(panelID) {
+
+        var filterPanel = document.getElementById('filter-board');
+
+        var sortPanel = document.getElementById('sort-board');
+
+        var targetPanel = document.getElementById(panelID);
+
+        // Checks whether the selected panel is hidden
+        var isHidden = targetPanel.classList.contains('hidden');
+
+        // Closes both Panels before reopening the selected one
+
+        if (filterPanel) filterPanel.classList.add('hidden');
+
+        if (sortPanel) sortPanel.classList.add('hidden');
+
+        if(isHidden) {
+            targetPanel.classList.remove('hidden');
+        }
+    }
+</script>
 {% endblock %}

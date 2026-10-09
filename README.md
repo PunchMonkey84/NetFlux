@@ -1,2 +1,2 @@
-# NetFlux
+# NetLux
 Personal Movie Website
